@@ -74,7 +74,16 @@ extern "C" void app_main(void)
     esp_modem_dte_config_t dte_config = ESP_MODEM_DTE_DEFAULT_USB_CONFIG(usb_config);  
     ESP_LOGI(TAG, "Waiting for USB device connection...");
     auto dte = create_usb_dte(&dte_config);
-    std::unique_ptr<DCE> dce = create_BG96_dce(&dce_config, dte, esp_netif);
+
+    #if CONFIG_EXAMPLE_MODEM_DEVICE_BG96 == 1
+        std::unique_ptr<DCE> dce = create_BG96_dce(&dce_config, dte, esp_netif);
+    #elif CONFIG_EXAMPLE_MODEM_DEVICE_SIM800 == 1
+        std::unique_ptr<DCE> dce = create_SIM800_dce(&dce_config, dte, esp_netif);
+    #elif CONFIG_EXAMPLE_MODEM_DEVICE_SIM7600 == 1
+        std::unique_ptr<DCE> dce = create_SIM7600_dce(&dce_config, dte, esp_netif);
+    #else
+    #error "Unsupported device"
+    #endif
 
 #else
 #error Invalid serial connection to modem.
